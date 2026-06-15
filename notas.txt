@@ -1,0 +1,77 @@
+____________________________________________________________________
+Black Friday Sales Dataset
+
+https://www.kaggle.com/datasets/noopurbhatt/retail-black-friday-sales-dataset
+
+Tarefa: Treinar um classificador de acordo com as discussões em sala de aula em um
+ módulo de inferência para demonstrar o modelo treinado em funcionamento
+
+O seu sistema inteligente deve:
+- indicar qual é a categoria de produto (product category) de acordo com a
+ circunstância na qual uma venda ocorra;
+- indicar qual será a forma de pagamento (payment_method) mais provável de acordo
+ com a circunstância da venda
+- indicar qual é o faixa etária (age_group) mais provável do comprador de acordo
+ com a circunstância da venda;
+
+Para todas as indicações acima, o seu sistema deve demonstrar um grau de certeza -
+ com base no score da classificação
+
+Você deve demonstrar, para cada indicação do seu sistema inteligente:
+    a) O fluxo de procedimentos até o treinamento do modelo (pipeline);
+    b) Acurácia global, acurácia por classes (use a matriz de confusão para tanto)
+     e a medida f1-score;
+    c) O funcionamento do sistema inteligente indicando categoria do produto,
+     forma de pagamento e faixa etária
+
+Medidas de acurácia a serem computadas e demonstradas
+- Acurácia global
+- Especificidade
+- Sensibilidade
+- F1-Score
+____________________________________________________________________
+SHAPE: 100.000 linhas x 18 colunas
+MISSING VALUES: zero em todas as colunas
+DATASET: sintético — balanceamento artificial perfeito nos três targets
+
+COLUNAS PARA DROP
+    - transaction_id: id único da transação
+    - customer_id: id do cliente
+    - product_id: id do produto
+    - purchase_date: datas únicas irrelevantes
+    - final_price: derivada de original_price, redundante
+
+O dataset possui três targets:
+    - product_category: nominal, 10 classes
+    - payment_method: nominal, 6 classes
+    - age_group: nominal, 5 classes
+
+SMOTE: não é necessário (balanceamento já perfeito nos três targets)
+
+FEATURES (mesmo X para os três modelos)
+
+CATEGÓRICAS - OHE:
+  gender: Male, Female, Other (3)
+  city: SF, Dallas, Phoenix, Miami, LA, Seattle, NY, Chicago, Houston, Atlanta (10)
+  customer_segment: Loyal, Returning, New, VIP (4)
+
+NUMÉRICAS CONTÍNUAS → StandardScaler:
+  original_price: valor original da transação (float)
+  purchase_amount: valor real da transação (float)
+
+NUMÉRICAS ORDINAIS → Passthrough (RF não precisa de escala):
+  discount_pct: valores de desconto (10) (int)
+  quantity: quantidade (int)
+  purchase_hour: hora da compra (int)
+  is_weekend: 0/1 (binário)
+  is_black_friday: 0/1 (binário)
+
+RELAÇÃO ENTRE TARGETS E FEATURES
+ Os três modelos usam o mesmo X (sem cross-contamination entre targets).
+ age_group, product_category e payment_method NÃO entram como features
+ entre si — evita dependência circular e mantém os três modelos independentes.
+
+--- ARQUITETURA ---
+Um único ColumnTransformer preprocessador para os três modelos.
+Três pipelines de treinamento separados (um por target).
+Três módulos de inferência ou um unificado — decidir na implementação.
